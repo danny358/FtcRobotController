@@ -14,7 +14,8 @@ public class James extends OpMode {
 
     @Override
     public void init_loop() {
-
+        telemetry.addData("Status", "Awaiting Start");
+        telemetry.update();
     }
 
     @Override
