@@ -8,7 +8,8 @@ public class James extends OpMode {
 
     @Override
     public void init() {
-
+        telemetry.addData("Status", "Initialized");
+        telemetry.update();
     }
 
     @Override
