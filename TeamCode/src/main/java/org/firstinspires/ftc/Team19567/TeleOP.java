@@ -58,8 +58,7 @@ public class TeleOP extends OpMode {           //Declares the class TestOPIterat
 
         releaseServoPos = releaseServo.MAX_POSITION;
         intakeServoPos = intakeServo.MIN_POSITION;
-
-        telemetry.update();
+  telemetry.update();
     }
 
     @Override
@@ -81,7 +80,7 @@ public class TeleOP extends OpMode {           //Declares the class TestOPIterat
 
     @Override
     public void loop() {
-        /* Mecanum drive applies forces at a 45 degree angle to its wheels, instead of directly (like most non-holonomic chassis);
+        /* Mecanum drive applies forces                          at a 45 degree angle to its wheels, instead of directly (like most non-holonomic chassis);
         this means that its axis of movement is not the tradition al x-y plane, but rather said plane rotated 45 degrees. This also means that the wheels
         of a mecanum chassis should be as close to a square as possible. That way, the rotated plane's axes push straight through the wheels for
         maximum efficiency. */

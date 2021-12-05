@@ -5,40 +5,17 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 
+@TeleOp(name="JAMES", group="Iterative Opmode")
 public class james extends OpMode {
-    DcMotor LB;
-    DcMotor LF;
-    DcMotor RB;
-    DcMotor RF;
+    DcMotor LB = null;
+    DcMotor LF = null;
+    DcMotor RB = null;
+    DcMotor RF = null;
+
+//note: telemetry will be implemented asap
+//Mecanum Drive...
 
 
-//Mecanum Drive
-
-    @Override
-
-    public void loop() {
-        double Up = -gamepad1.left_stick_y;
-        double Side = gamepad1.left_stick_x;
-        double pivot = gamepad1.right_stick_x; //controls pivotting movements
-
-        double r = Math.hypot(gamepad1.left_stick_x, gamepad1.left_stick_y);
-        double RA = Math.atan2(gamepad1.left_stick_y, gamepad1.left_stick_x) - Math.PI / 4;
-
-        // caculates the amount of power we need in motors...
-
-        final double LS1 = (r * Math.sin(RA) - gamepad1.right_stick_x);
-        final double RS1 = (r * Math.cos(RA) + gamepad1.right_stick_x);
-        final double LS2 = (r * Math.cos(RA) - gamepad1.right_stick_x);
-        final double RS2 = (r * Math.sin(RA) + gamepad1.right_stick_x);
-
-
-//commented out not-needed segments
-
-//RF.setPower(Skyblock + (-Up + Side));
-//RB.setPower(Skyblock + (-Up - Side));
-//LF.setPower(Skyblock + (-Up - Side));
-//LB.setPower(Skyblock + (-Up + Side));
-    }
 
     @Override
 
@@ -47,15 +24,45 @@ public class james extends OpMode {
         LF = hardwareMap.get(DcMotor.class, "LF");
         RB = hardwareMap.get(DcMotor.class, "RB");
         RF = hardwareMap.get(DcMotor.class, "RF");
-
-
-}
+    }
     @Override
 
     public void start () {
+        telemetry.addData("status","Started" );
         telemetry.update();
         RB.setDirection(DcMotorSimple.Direction.REVERSE); //sets R motors to reverse IF we need... and I dont know about the L motors
         RF.setDirection(DcMotorSimple.Direction.REVERSE);
+    }
+    public void init_loop() {
+        telemetry.addData("status","init_loop" );
+        telemetry.update();
+    }
+    @Override
+
+    public void  loop() {
+
+        double r = Math.hypot(gamepad1.left_stick_x, gamepad1.left_stick_y);
+        double RA = Math.atan2(gamepad1.left_stick_y, gamepad1.left_stick_x) - Math.PI / 4;
+
+        // caculates the amount of power we need in motors...
+
+        final double L1 = (r * Math.sin(RA) - gamepad1.right_stick_x);
+        final double R1 = (r * Math.cos(RA) + gamepad1.right_stick_x);
+        final double L2 = (r * Math.cos(RA) - gamepad1.right_stick_x);
+        final double R2 = (r * Math.sin(RA) + gamepad1.right_stick_x);
+
+        LF.setPower(L1);
+        RF.setPower(R1);
+        LB.setPower(L2);
+        RB.setPower(R2);
+//commented out tank drivetrain mode ensenstiallyyyyE (no strafing just turning)
+        //double Up = -gamepad1.left_stick_y;
+//double Side = gamepad1.left_stick_x;
+//double pivot = gamepad1.right_stick_x;
+//RF.setPower(Skyblock + (-Up + Side));
+//RB.setPower(Skyblock + (-Up - Side));
+//LF.setPower(Skyblock + (-Up - Side));
+//LB.setPower(Skyblock + (-Up + Side));
     }
 }
 
