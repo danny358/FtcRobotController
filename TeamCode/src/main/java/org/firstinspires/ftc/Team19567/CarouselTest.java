@@ -41,7 +41,7 @@ public class CarouselTest extends OpMode{
         double initPower = 0.7;
         double finalPower = 1;
 
-        if(gamepad1.dpad_right || gamepad2.dpad_right){
+        if(gamepad2.right_trigger > 0 || gamepad1.dpad_right || gamepad1.dpad_left){
             carTime.reset();
             while (carTime.milliseconds() <= milliCarousel){
                 mechanisms.rotateCarousel(initPower);
