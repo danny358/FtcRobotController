@@ -13,6 +13,10 @@ public class CarouselTest extends OpMode{
     private DcMotor carouselRight = null;
     private Mechanisms mechanisms = null;
     private final ElapsedTime carTime = new ElapsedTime();
+    private int milliCarousel = 2000;
+    private double initPower = 0.7;
+    private double finalPower = 1;
+
 
     @Override
     public void init() {
@@ -36,10 +40,6 @@ public class CarouselTest extends OpMode{
 
     @Override
     public void loop() {
-
-        int milliCarousel = 2000;
-        double initPower = 0.7;
-        double finalPower = 1;
 
         if(gamepad2.right_trigger > 0 || gamepad1.dpad_right || gamepad1.dpad_left){
             carTime.reset();
