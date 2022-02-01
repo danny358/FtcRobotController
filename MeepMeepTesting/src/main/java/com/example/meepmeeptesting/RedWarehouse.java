@@ -1,4 +1,3 @@
-
 package com.example.meepmeeptesting;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
@@ -6,7 +5,7 @@ import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.noahbres.meepmeep.MeepMeep;
 import com.noahbres.meepmeep.core.colorscheme.scheme.ColorSchemeRedDark;
 
-public class MeepMeepTesting {
+public class RedWarehouse {
     public static void main(String args[]) {
         MeepMeep mm = new MeepMeep(800)
                 // Set field image
@@ -16,13 +15,14 @@ public class MeepMeepTesting {
                 // Background opacity from 0-1
                 .setBackgroundAlpha(1f)
                 // Set constraints: maxVel, maxAccel, maxAngVel, maxAngAccel, track width
-                .setConstraints(60, 60, Math.toRadians(180), Math.toRadians(180), 15).setBotDimensions(12, 15)
+                .setConstraints(38.7, 30, 4.5836622, Math.toRadians(60), 14.2).setBotDimensions(13.2,16.603)
                 .followTrajectorySequence(drive ->
-                        drive.trajectorySequenceBuilder(new Pose2d(6, 63, Math.toRadians(90))).waitSeconds(1)
-                                .lineToSplineHeading(new Pose2d(7,24,0))
-                                .lineTo(new Vector2d(12,64)).strafeTo(new Vector2d(47,64)).waitSeconds(3)
-                                .strafeTo(new Vector2d(15,-64)).lineToSplineHeading(new Pose2d(-11.5,-41,Math.toRadians(-90)))
-                                .waitSeconds(3).lineToSplineHeading(new Pose2d(12,64,0)).strafeTo(new Vector2d(45,64)).waitSeconds(3)
-                                .build());
+                        drive.trajectorySequenceBuilder(new Pose2d(6, -63, Math.toRadians(270)))
+                                .strafeTo(new Vector2d(0,-45)).turn(Math.toRadians(-150))
+                                .splineToConstantHeading(new Vector2d(6,27),Math.toRadians(120))
+                                .strafeTo(new Vector2d(6, 27))
+                                .strafeTo(new Vector2d(-40,27))
+                                .build())
+                .start();
     }
 }

@@ -10,9 +10,9 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 
-@Autonomous(name="Blue Warehouse", group="Linear Opmode")
+@Autonomous(name="OG Blue Warehouse", group="Linear Opmode")
 
-public class blue_Warehouse extends LinearOpMode {
+public class og_blue_warehouse extends LinearOpMode {
 
     private ElapsedTime runtime = new ElapsedTime();
     private DcMotor leftDCFront = null;

@@ -5,18 +5,17 @@ package org.firstinspires.ftc.Team19567; //The "namespace" for the project is de
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.Blinker;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
-@TeleOp(name="TeleOP", group="Dababy") //Gives the TeleOp its name in the driver station menu and categorizes it as an Iterative OpMode
-public class TeleOP extends OpMode {           //Declares the class TestOPIterative, which is a child of OpMode
+@TeleOp(name="TestOP", group="Iterative Opmode") //Gives the TeleOp its name in the driver station menu and categorizes it as a TeleOp (Iterative OpMode)
+public class TestOP extends OpMode {           //Declares the class TestOPIterative, which is a child of OpMode
     //Declare OpMode members
     private final ElapsedTime runtime = new ElapsedTime();
     private DcMotor leftDCFront = null;
@@ -29,31 +28,19 @@ public class TeleOP extends OpMode {           //Declares the class TestOPIterat
     private DcMotor armDC = null;
     private Servo releaseServo = null;
     private Servo balanceServo = null;
-    private TouchSensor limitSwitch = null;
     private DistanceSensor distanceSensor = null;
+    private RevBlinkinLedDriver blinker = null;
     private double carouselLeftPower = 0.0;
     private double carouselRightPower = 0.0;
     private double armPos = 0;
-    private double armPower = 0.5;
+    private double armPower = 1.0;
     private double intakePower = 0.0;
     private double releaseServoPos = 0.0;
     private double balanceServoPos = 0.0;
-    //private RevBlinkinLedDriver blinkin = null;
     private boolean isSlowmode = false;
     private double acc = 1.0;
-    //private RevBlinkinLedDriver.BlinkinPattern blinkinPattern = RevBlinkinLedDriver.BlinkinPattern.BEATS_PER_MINUTE_RAINBOW_PALETTE;
     private Mechanisms mechanisms = null;
-
-    public enum PRESETSTATE {
-        SHARED_HUB,
-        ALLIANCE_FIRST,
-        ALLIANCE_SECOND,
-        ALLIANCE_THIRD,
-        GOING_DOWN,
-        NO_PRESET
-    }
-
-    private PRESETSTATE presetState = PRESETSTATE.NO_PRESET;
+    private RevBlinkinLedDriver.BlinkinPattern blinkinPattern = RevBlinkinLedDriver.BlinkinPattern.TWINKLES_RAINBOW_PALETTE;
 
     @Override
     public void init() {
@@ -69,9 +56,8 @@ public class TeleOP extends OpMode {           //Declares the class TestOPIterat
         armDC = hardwareMap.get(DcMotor.class, "armDC");
         releaseServo = hardwareMap.get(Servo.class, "releaseServo");
         balanceServo = hardwareMap.get(Servo.class, "balanceServo");
-        limitSwitch = hardwareMap.get(TouchSensor.class,"limitSwitch");
-        //blinkin = hardwareMap.get(RevBlinkinLedDriver.class, "blinkin");
         distanceSensor = hardwareMap.get(DistanceSensor.class,"distanceSensor");
+        blinker = hardwareMap.get(RevBlinkinLedDriver.class,"blinkin");
 
         //Set direction to be forward in case the robot's motors are oriented otherwise; can change FORWARD to REVERSE if necessary
 
@@ -79,11 +65,10 @@ public class TeleOP extends OpMode {           //Declares the class TestOPIterat
         rightDCFront.setDirection(DcMotor.Direction.REVERSE);
         leftDCBack.setDirection(DcMotor.Direction.FORWARD);
         rightDCBack.setDirection(DcMotor.Direction.REVERSE);
-        intakeDC.setDirection(DcMotor.Direction.FORWARD);
-        armDC.setDirection(DcMotor.Direction.REVERSE);
-        balanceServo.setDirection(Servo.Direction.REVERSE);
+        intakeDC.setDirection(DcMotor.Direction.REVERSE);
+        armDC.setDirection(DcMotor.Direction.FORWARD);
 
-        releaseServoPos = 1.0;
+        releaseServoPos = releaseServo.MAX_POSITION;
         balanceServoPos = balanceServo.MIN_POSITION;
         mechanisms = new Mechanisms(armDC,carouselLeft,carouselRight,intakeDC,balanceServo,releaseServo,telemetry);
 
@@ -126,102 +111,42 @@ public class TeleOP extends OpMode {           //Declares the class TestOPIterat
         if(gamepad1.y) isSlowmode = !isSlowmode;
         if(isSlowmode) acc = 0.3;
         else acc = 1.0;
-        final double leftFrontSpeed = (r * Math.sin(angleDC) - gamepad1.right_stick_x)*acc; //Using the math explained above, we can obtain the values we want to multiply each wheel by. acc is the variable which controls the overall multiplier of how fast we want to go.
+        final double leftFrontSpeed = (r * Math.cos(angleDC) - gamepad1.right_stick_x)*acc; //Using the math explained above, we can obtain the values we want to multiply each wheel by. acc is the variable which controls the overall multiplier of how fast we want to go.
         final double rightFrontSpeed = (r * Math.cos(angleDC) + gamepad1.right_stick_x)*acc;
-        final double leftBackSpeed = (r * Math.cos(angleDC) - gamepad1.right_stick_x)*acc;
+        final double leftBackSpeed = (r * Math.sin(angleDC) - gamepad1.right_stick_x)*acc;
         final double rightBackSpeed = (r * Math.sin(angleDC) + gamepad1.right_stick_x)*acc;
         //INTAKE
-        if(gamepad1.right_trigger > 0) mechanisms.moveIntake(0.68*gamepad1.right_trigger);
-        else if(gamepad1.right_bumper) mechanisms.moveIntake(-0.8);
-        else if(limitSwitch.isPressed()) mechanisms.moveIntake(0.0);
-        else mechanisms.moveIntake(-0.06);
+        if(gamepad1.right_trigger > 0) mechanisms.moveIntake(0.75*gamepad1.right_trigger);
+        else if(gamepad2.right_trigger > 0) mechanisms.moveIntake(0.75*gamepad2.right_trigger);
+        else mechanisms.moveIntake(0.0);
 
-        if(gamepad1.right_bumper || gamepad2.right_bumper) intakePower = -1.0;
+        if(gamepad1.right_bumper || gamepad2.right_bumper) mechanisms.moveIntake(-1.0);
         //CAROUSEL
-        //t
         if(gamepad1.dpad_right || gamepad2.dpad_right) {
             mechanisms.rotateCarousel(0.5);
         }
         else if(gamepad1.dpad_left || gamepad2.dpad_left) {
-            mechanisms.rotateCarousel(0.5);
+            mechanisms.rotateCarousel(-0.5);
         }
         else {
             mechanisms.rotateCarousel(0.0);
         }
         //ARM
-        if(gamepad1.left_trigger > 0 || gamepad2.left_trigger > 0) armPos = Range.clip(armPos+gamepad1.left_trigger*4,0,1000);
-        else if(gamepad1.left_trigger > 0 || gamepad2.left_trigger > 0) armPos = Range.clip(armPos+gamepad2.left_trigger*4,0,1000);
-        if(gamepad1.left_bumper || gamepad2.left_bumper) armPos = Range.clip(armPos-4,0,1000);
-        if(gamepad1.x || gamepad2.x) {
-            presetState = PRESETSTATE.ALLIANCE_FIRST;
-        }
-        else if(gamepad2.y) {
-            presetState = PRESETSTATE.ALLIANCE_THIRD;
-        }
-        else if(gamepad1.a || gamepad2.a) {
-            presetState = PRESETSTATE.ALLIANCE_THIRD;
-        }
+        if(gamepad1.left_trigger > 0) armPos = Range.clip(armPos+gamepad1.left_trigger*2,0,1000);
+        else if(gamepad2.left_trigger > 0) armPos = Range.clip(armPos+gamepad2.left_trigger*2,0,1000);
+        if(gamepad1.left_bumper || gamepad2.left_bumper) armPos = Range.clip(armPos-2,0,1000);
 
 //SERVOS
-        if(gamepad1.dpad_down || gamepad2.dpad_down) releaseServoPos = Range.clip(releaseServoPos-0.01,releaseServo.MIN_POSITION,releaseServo.MAX_POSITION);
-        else if(gamepad1.dpad_up || gamepad2.dpad_up) releaseServoPos = Range.clip(releaseServoPos+0.01,releaseServo.MIN_POSITION,releaseServo.MAX_POSITION);
-        if(gamepad1.b || gamepad2.b) {
-            presetState = PRESETSTATE.GOING_DOWN;
-        }
-        if(gamepad2.right_bumper) releaseServoPos = 0.3;
-        if(presetState != PRESETSTATE.NO_PRESET) {
-            armPower = 0.18;
-            switch(presetState) {
-                case ALLIANCE_FIRST: {
-                    armPower = 0.12;
-                    armPos = 875;
-                    if(armDC.getCurrentPosition() >= 870) {
-                        presetState = PRESETSTATE.NO_PRESET;
-                    }
-                    break;
-                }
-                case ALLIANCE_SECOND: {
-                    armPos = 750;
-                    if(armDC.getCurrentPosition() >= 750) {
-                        presetState = PRESETSTATE.NO_PRESET;
-                    }
-                    break;
-                }
-                case ALLIANCE_THIRD: {
-                    armPos = 590;
-                    if(armDC.getCurrentPosition() >= 590) {
-                        presetState = PRESETSTATE.NO_PRESET;
-                    }
-                    break;
-                }
-                case GOING_DOWN: {
-                    armPower = 0.125;
-                    armPos = 0;
-                    releaseServoPos = 1.0;
-                    if(armDC.getCurrentPosition() <= 5) {
-                        presetState = PRESETSTATE.NO_PRESET;
-                    }
-                }
-                default: {
-                    break;
-                }
-            }
+        if(gamepad1.dpad_down || gamepad2.dpad_down) releaseServoPos = Range.clip(releaseServoPos-0.006,releaseServo.MIN_POSITION,releaseServo.MAX_POSITION);
+        else if(gamepad1.dpad_up || gamepad2.dpad_up) releaseServoPos = Range.clip(releaseServoPos+0.006,releaseServo.MIN_POSITION,releaseServo.MAX_POSITION);
+        if(gamepad1.b || gamepad2.b) mechanisms.reset();
+
+//SENSORS
+        if(distanceSensor.getDistance(DistanceUnit.MM) <= 50) {
+            blinker.setPattern(RevBlinkinLedDriver.BlinkinPattern.BEATS_PER_MINUTE_RAINBOW_PALETTE);
         }
         else {
-            armPower = 0.5;
-        }
-// BOUNCE BOUNCE BOUNCE BOUNCE BOUNCE BOUNCE BOUNCE BOUNCE BOUNCE BOUNCE BOUNCE BOUNCE BOUNCE BOUNCE BOUNCE BOUNCE BOUNCE
-        balanceServoPos = Range.clip((armDC.getCurrentPosition()-100)/1050.1,balanceServo.MIN_POSITION,balanceServo.MAX_POSITION);
-        /* if(runtime.milliseconds() >= 85000 && runtime.milliseconds() <= 90000) blinkinPattern = RevBlinkinLedDriver.BlinkinPattern.BEATS_PER_MINUTE_LAVA_PALETTE;
-        else if(presetState != PRESETSTATE.NO_PRESET) blinkinPattern = RevBlinkinLedDriver.BlinkinPattern.TWINKLES_PARTY_PALETTE;
-        else if(distanceSensor.getDistance(DistanceUnit.MM) <= 80) {
-            blinkinPattern = RevBlinkinLedDriver.BlinkinPattern.STROBE_GOLD;
-            telemetry.addData("Distance Sensor","Freight Detected");
-        }
-        else blinkinPattern = RevBlinkinLedDriver.BlinkinPattern.BEATS_PER_MINUTE_RAINBOW_PALETTE;
-        blinkin.setPattern(blinkinPattern); */
-        if(distanceSensor.getDistance(DistanceUnit.MM) <= 80 && !(releaseServoPos >= 0.88 && releaseServoPos <= 0.98)) {
-            telemetry.addData("Distance Sensor","Freight Detected");
+            blinker.setPattern(RevBlinkinLedDriver.BlinkinPattern.TWINKLES_RAINBOW_PALETTE);
         }
 
 //MOTOR SET POWER
@@ -230,12 +155,12 @@ public class TeleOP extends OpMode {           //Declares the class TestOPIterat
         leftDCBack.setPower(leftBackSpeed);
         rightDCBack.setPower(rightBackSpeed);
         carouselLeft.setPower(carouselLeftPower);
-        //intakeDC.setPower(intakePower);
+        intakeDC.setPower(intakePower);
         armDC.setTargetPosition((int) armPos);
         armDC.setPower(armPower);
         releaseServo.setPosition(releaseServoPos);
-        balanceServo.setPosition(balanceServoPos);
-        //mechanisms.maintainBalance(); //TODO: SEE IF THIS ACTUALLY WORKS
+        mechanisms.maintainBalance(); //TODO: SEE IF THIS ACTUALLY WORKS
+        blinker.setPattern(blinkinPattern);
 //TELEMETRY
         telemetry.addData("Status", "Looping"); //Add telemetry to show that the program is currently in the loop function
         telemetry.addData("Runtime", runtime.toString() + " Milliseconds"); //Display the runtime
