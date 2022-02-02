@@ -12,7 +12,7 @@ public class CarouselTest extends OpMode{
     private DcMotor carouselLeft = null;
     private DcMotor carouselRight = null;
     private Mechanisms mechanisms = null;
-    private final ElapsedTime carTime = new ElapsedTime();
+    private final ElapsedTime carouselTime = new ElapsedTime();
     private int milliCarousel = 2000;
     private double initPower = 0.7;
     private double finalPower = 1;
@@ -35,36 +35,34 @@ public class CarouselTest extends OpMode{
     public void start() {
         telemetry.addData("Status", "Started");
         telemetry.update();
-        carTime.reset();
+        carouselTime.reset();
     }
 
     @Override
     public void loop() {
 
         if(gamepad2.right_trigger > 0 || gamepad1.dpad_right || gamepad1.dpad_left){
-            carTime.reset();
-            while (carTime.milliseconds() <= milliCarousel){
-                mechanisms.rotateCarousel(initPower);
-            }
-            mechanisms.rotateCarousel(finalPower);
+            carouselTime.reset();
+            if(carouselTime.milliseconds() <= milliCarousel) mechanisms.rotateCarousel(initPower);
+            else mechanisms.rotateCarousel(finalPower);
         }
 
         if(gamepad1.right_trigger > 0){
             milliCarousel += 200;
         }
-        if(gamepad1.right_bumper){
+        else if(gamepad1.right_bumper){
             milliCarousel -= 200;
         }
 
-        if(gamepad1.left_trigger > 0){
+        else if(gamepad1.left_trigger > 0){
             initPower += 0.05;
         }
 
-        if(gamepad1.left_bumper){
+        else if(gamepad1.left_bumper){
             initPower -= 0.05;
         }
 
-        if(gamepad2.dpad_down){
+        else if(gamepad2.dpad_down){
             finalPower -= 0.05;
         }
 
