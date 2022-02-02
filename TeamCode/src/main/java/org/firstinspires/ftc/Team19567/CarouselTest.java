@@ -56,7 +56,7 @@ public class CarouselTest extends OpMode{
         {
             carouselTime.reset();
             if(carouselTime.milliseconds() <= milliCarousel) mechanisms.rotateCarousel(initPower);
-            else mechanisms.rotateCarousel(Range.clip(((carouselTime.milliseconds() - expStartPoint/expCoefficient) + initPower)**2,initPower, finalPower);
+            else mechanisms.rotateCarousel(Range.clip(Math.pow(2 , (carouselTime.milliseconds() - expStartPoint/expCoefficient) + initPower)),initPower, finalPower);
 
         }
          */
