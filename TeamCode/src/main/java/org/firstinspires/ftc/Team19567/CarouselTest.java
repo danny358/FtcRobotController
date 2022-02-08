@@ -14,11 +14,11 @@ public class CarouselTest extends OpMode{
     private DcMotor carouselRight = null;
     private Mechanisms mechanisms = null;
     private final ElapsedTime carouselTime = new ElapsedTime();
-    public int milliCarousel = 2000;
+    public int milliAccelerate = 800;
+    public int milliMax = 1300;
     public double initPower = 0.6;
-    public double finalPower = 6;
-    public double expStartPoint = 1000;
-    public double expCoefficient = 50;
+    public double accPower = initPower;
+    public int accCoefficient = 2000;
 
 
     @Override
@@ -47,8 +47,12 @@ public class CarouselTest extends OpMode{
         if(gamepad2.right_trigger > 0 || gamepad1.dpad_right || gamepad1.dpad_left)
         {
             carouselTime.reset();
-            if(carouselTime.milliseconds() <= milliCarousel) mechanisms.rotateCarousel(initPower);
-            else mechanisms.rotateCarousel(finalPower);
+            if(carouselTime.milliseconds() <= milliAccelerate) mechanisms.rotateCarousel(initPower);
+            if(carouselTime.milliseconds() >= milliAccelerate && carouselTime.milliseconds() <= milliMax) {
+                accPower +=  carouselTime.milliseconds()/accCoefficient;
+                mechanisms.rotateCarousel(accPower);
+            }
+            else mechanisms.rotateCarousel(1);
         }
 
         /*
@@ -63,11 +67,10 @@ public class CarouselTest extends OpMode{
 
 
         telemetry.addData("Status", "Looping");
-        telemetry.addData("Carousel Runtime ", milliCarousel + " Milliseconds");
+        telemetry.addData("Time till acceleration ", milliAccelerate + " Milliseconds");
         telemetry.addData("Initial Carousel Speed ", initPower);
-        telemetry.addData("Final Carousel Speed ", finalPower);
-        telemetry.addData("Exponential Delay ", expStartPoint);
-        telemetry.addData("Exponential Coefficient" , expCoefficient);
+        telemetry.addData("Acceleration", accPower);
+        telemetry.addData("Acceleration Coefficient", accCoefficient);
         telemetry.update();
 
     }
