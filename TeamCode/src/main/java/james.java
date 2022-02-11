@@ -37,7 +37,7 @@ public class james extends LinearOpMode
                 .build();
 
 
-
+while (opModeIsActive()) {
         waitForStart();
         runtime.reset();    // Start game timer.
 
@@ -54,8 +54,7 @@ public class james extends LinearOpMode
             gamepad1.runRumbleEffect(endGameRumble);
 
         }
-        else {
-            gamepad1.stopRumble();
+
         }
     }
 }
