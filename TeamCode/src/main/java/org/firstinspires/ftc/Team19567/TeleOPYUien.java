@@ -37,6 +37,13 @@ public class TeleOPYUien extends OpMode {
     private double intakePower = 0.0;
     private double releaseServoPos = 0.0;
     private double balanceServoPos = 0.0;
+    private final ElapsedTime carouselTime = new ElapsedTime();
+    public int milliAccelerate = 800;
+    public int milliMax = 1300;
+    public double initPower = -0.6;
+    public double accPower = initPower;
+    public int accCoefficient = 2000;
+
     //private RevBlinkinLedDriver blinkin = null;
     private boolean isSlowmode = false;
     private double acc = 1.0;
@@ -133,23 +140,20 @@ public class TeleOPYUien extends OpMode {
         if(gamepad1.right_trigger > 0) mechanisms.moveIntake(0.68*gamepad1.right_trigger);
         else if(gamepad1.right_bumper) mechanisms.moveIntake(-0.8);
         else if(limitSwitch.isPressed()) mechanisms.moveIntake(0.0);
-        else mechanisms.moveIntake(-0.06);
+        else mechanisms.moveIntake(-0.06
+            );
 
         if(gamepad1.right_bumper || gamepad2.right_bumper) intakePower = -1.0;
         //CAROUSEL
-        if(gamepad1.dpad_right || gamepad2.dpad_right) {
-            long start = System.nanoTime();
-            mechanisms.rotateCarousel(0.5);
-            long end = System.nanoTime();
-            long elapsedtime = end - start;
-            if (elapsedtime >= 10);
-                mechanisms.rotateCarousel(1);
-        }
-        else if(gamepad1.dpad_left || gamepad2.dpad_left) {
-            mechanisms.rotateCarousel(0.5);
-        }
-        else {
-            mechanisms.rotateCarousel(0.0);
+        if(gamepad2.right_trigger > 0 || gamepad1.dpad_right || gamepad1.dpad_left)
+        {
+            carouselTime.reset();
+            if(carouselTime.milliseconds() <= milliAccelerate) mechanisms.rotateCarousel(initPower);
+            if(carouselTime.milliseconds() >= milliAccelerate && carouselTime.milliseconds() <= milliMax) {
+                accPower -=  -1*(carouselTime.milliseconds()/accCoefficient);
+                mechanisms.rotateCarousel(accPower);
+            }
+            else mechanisms.rotateCarousel(-1);
         }
         //ARM
         if(gamepad1.left_trigger > 0 || gamepad2.left_trigger > 0) armPos = Range.clip(armPos+gamepad1.left_trigger*4,0,1000);
